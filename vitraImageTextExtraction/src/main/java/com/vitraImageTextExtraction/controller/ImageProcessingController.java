@@ -1,7 +1,9 @@
 package com.vitraImageTextExtraction.controller;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.Blob;
 import java.util.Map;
 
 import org.hibernate.engine.jdbc.BlobProxy;
@@ -18,7 +20,6 @@ import com.vitraImageTextExtraction.entities.Image;
 import com.vitraImageTextExtraction.repository.ImageRepository;
 
 import net.sourceforge.tess4j.Tesseract;
-import net.sourceforge.tess4j.TesseractException;
 
 @RestController
 @CrossOrigin(value = { "*" })
@@ -35,7 +36,9 @@ public class ImageProcessingController {
 			img.setData(BlobProxy.generateProxy(file.getBytes()));
 			Image savedImage = imageRepository.save(img);
 			String textFromImage = processImage(savedImage);
-			return new ResponseEntity<>(Map.of("id", savedImage.getId(), "name", savedImage.getName(), "text", textFromImage), HttpStatus.OK);
+			return new ResponseEntity<>(
+					Map.of("id", savedImage.getId(), "name", savedImage.getName(), "text", textFromImage),
+					HttpStatus.OK);
 		} catch (IOException e) {
 			return new ResponseEntity<>(Map.of("Message", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -43,24 +46,21 @@ public class ImageProcessingController {
 
 	private String processImage(Image savedImage) {
 		System.out.println(savedImage);
-		
-		/*
-		
-		Tesseract tesseract = new Tesseract(); 
-        try { 
-//            tesseract.setDatapath("D:/Tess4J/tessdata"); 
-  
-            // the path of your tess data folder 
-            // inside the extracted file 
-            String text 
-                = tesseract.doOCR(new File("image.jpg")); 
-  
-            // path of your image file 
-            System.out.print(text); 
-        } 
-        catch (TesseractException e) { 
-            e.printStackTrace(); 
-        } */
+
+		try {
+
+			Blob blob = savedImage.getData();
+			System.out.println("Read " + blob.length() + " bytes ");
+			byte[] array = blob.getBytes(1, (int) blob.length());
+			File file = File.createTempFile("something-", ".binary", new File("."));
+			FileOutputStream out = new FileOutputStream(file);
+			out.write(array);
+
+		  Tesseract tesseract = new Tesseract();
+			  tesseract.setDatapath(".");
+		  
+		} catch (Exception e) {}
+		 
 		return "will be text";
 	}
 }
