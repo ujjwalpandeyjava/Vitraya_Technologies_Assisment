@@ -12,5 +12,24 @@ code {
     monospace;
 }
 .selectedImg{
+  min-height: 400px;
   max-height: 30dvh;
+}
+
+.imageUpload{
+  padding-block: 2rem;
+  display: grid;
+  place-items: center;
+  gap:2rem;
+}
+
+.imageUpload img{
+  filter: drop-shadow(0 0 5px gray);
+  border-radius: 1em;
+  text-align: center;
+  margin: auto;
+}
+
+.imgToText {
+  font-weight: bold;
 }

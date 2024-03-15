@@ -3,9 +3,11 @@ import apiEndPoints from '../action/api';
 
 const ImageToText = () => {
   const [selectedImage, setSelectedImage] = useState(null);
+  const [text, setText] = useState("");
 
   const handleImageUpload = (event) => {
     setSelectedImage(event.target.files[0]);
+    console.log(event.target.files[0]);
   };
 
   const upload = () => {
@@ -21,16 +23,26 @@ const ImageToText = () => {
         console.warn(res);
         if (res.status === 200) {
           res = await res.data;
-          console.log(res);
+          console.log(typeof res, res);
+          setText(res.text)
         }
       }).catch(error => {
         console.error(error.message);
       })
   }
   return (
-    <div>
+    <div className='imageUpload'>
       <input type="file" onChange={handleImageUpload} />
-      {selectedImage && <img className="selectedImg" src={selectedImage} alt="Selected" />}
+      <div>
+        {selectedImage && <>
+          <img className="selectedImg" src={URL.createObjectURL(selectedImage)} alt="Selected" /> <br />
+          Image name: -- {selectedImage.name}
+        </>}
+      </div>
+      <div className='imgToText'>
+
+      {text}
+      </div>
       <div>
         <button onClick={upload}>Upload</button>
       </div>
