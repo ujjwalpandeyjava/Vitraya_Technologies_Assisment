@@ -1,20 +1,23 @@
 package com.vitraImageTextExtraction.entities;
 
-import org.springframework.web.multipart.MultipartFile;
+
+import java.sql.Blob;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.persistence.Lob;
 import lombok.Data;
 
-@Entity
 @Data
+@Entity
 public class Image {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	private String imagePath;
-	private MultipartFile file;
+	private String name;
+	@Lob
+//	private byte[] data; // This will hold the Base64-encoded file
+	private Blob data; // This will hold the Base64-encoded file
 }

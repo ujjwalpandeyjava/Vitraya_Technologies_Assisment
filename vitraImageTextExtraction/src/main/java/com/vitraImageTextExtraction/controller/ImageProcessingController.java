@@ -1,64 +1,39 @@
 package com.vitraImageTextExtraction.controller;
 
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.util.Base64;
-import java.util.Map;
+import java.io.IOException;
 
+import org.hibernate.engine.jdbc.BlobProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.vitraImageTextExtraction.entities.Image;
-//import com.vitraImageTextExtraction.repository.ImageRepository;
-
-import jakarta.servlet.annotation.MultipartConfig;
-import jakarta.validation.Valid;
+import com.vitraImageTextExtraction.repository.ImageRepository;
 
 @RestController
-@MultipartConfig(maxFileSize = 16177215)
-@CrossOrigin(value = { "http://localhost:3000" })
+@CrossOrigin(value = { "*" })
 public class ImageProcessingController {
 
-//	@Autowired
-//	private ImageRepository imageRepository;
+	@Autowired
+	private ImageRepository imageRepository;
 
-	@PostMapping("/upload")
-	public ResponseEntity<String> uploadFile(@RequestBody Image payload) {
-		System.out.println(payload);
+	@PostMapping("/img")
+	public ResponseEntity uploadImage(@RequestParam MultipartFile file) {
 		try {
-			ZonedDateTime datetime = ZonedDateTime.parse(payload.get("datetime"));
-			String fileBase64 = payload.get("file");
+			Image img = new Image();
+			img.setName(file.getOriginalFilename());
+//			img.setData(file.getBytes());
+			img.setData(BlobProxy.generateProxy(file.getBytes()));
+			System.out.println("saveImg: " + img);
 
-//			byte[] fileBytes = Base64.getDecoder().decode(fileBase64);
-
-			Image image = new Image();
-//			System.out.println(payload.get("file").getClass());
-//			imageRepository.save(image);
-			
-			return new ResponseEntity<>("File uploaded successfully", HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(imageRepository.save(img), HttpStatus.OK);
+		} catch (IOException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-	}
-
-	@PostMapping("/upload_")
-	public ResponseEntity<Image> uploadImage(@Valid @RequestBody Image image) {
-		System.out.println(image);
-		/*
-		 * String base64Image = ""; try { byte[] bytes = image.getFile().getBytes();
-		 * base64Image = Base64.getEncoder().encodeToString(bytes);
-		 * System.out.println(base64Image); } catch (Exception e) { e.printStackTrace();
-		 * }
-		 * 
-		 * Image savedImage = imageRepository.save(image);
-		 * 
-		 * // get the text from image
-		 */
-		return ResponseEntity.ok(new Image());
 	}
 }

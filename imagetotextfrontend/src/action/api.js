@@ -10,16 +10,21 @@ const apiEndPoints = {
 			home: () => ax.get(url),
 		}
 	},
-
 	AUTH(url = '/auth') {
 		return {
-			// register: (payload) => ax.get(url, { params: { ...payload } }),
 			register: (payload) => ax.post(url + "/register", payload),
-			login: (payload) => ax.post(url + '/login', payload),
-			fetchPaginated: (paginateData) => {
-				const params = { ...paginateData };
-				const headers = {};
-				return ax.get(url, { headers, params })
+			login: (payload) => ax.post(url + '/login', payload)
+		}
+	},
+	IMG_UPLOAD(url = "/img") {
+		return {
+			imgUpload: (data) => {
+				return ax.post(url, data, {
+					params: { ...data },
+					headers: {
+						// "Content-Type": "multipart/form-data"
+					}
+				})
 			},
 
 		}
